@@ -9,6 +9,8 @@ import pygame, time, random
 #set some basic variables
 pygame.init()
 
+pygame.font.init()
+
 display_width = 800
 display_height = 600
 
@@ -24,6 +26,7 @@ grey = ((150,150,150))
 # other required variables
 doors = []
 
+
 # sets up template for each door
 class door:
     size = 0 
@@ -35,6 +38,14 @@ class door:
 # game function
 def game():
 
+    myfont = pygame.font.SysFont('Comic Sans MS', 30)
+    textsurface = myfont.render("Score: " +str(0), False, (0, 0, 0))
+    
+    mouseDownPast = False
+    mouseDownNow = False
+
+    score = 0
+    
     # create desired number of doors
     for i in range(0,5):
         newDoor = door()
@@ -49,11 +60,20 @@ def game():
     # the game loop
     while True:
 
+        mouseX, mouseY = pygame.mouse.get_pos()
+
+        
         # check for events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouseDownNow = True
+
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                mouseDownNow = False
         
 
         # refresh the screen
@@ -81,11 +101,30 @@ def game():
 
                 doors[i].doorOpen = False
 
+            if mouseX >= doors[i].x and mouseX <= doors[i].x + doors[i].size:
+                if mouseY >= doors[i].y and mouseY <= doors[i].y + doors[i].size*1.5:
+                    if mouseDownNow == True and mouseDownPast == False:
+                        if doors[i].doorOpen:
+                            score+=1
+                            textsurface = myfont.render("Score: " +str(score), False, (0, 0, 0))
+
+                            doors[i].size = random.randrange(40, 70)
+                            doors[i].y = display_height
+                            doors[i].x = random.randrange(0, display_width-newDoor.size)
+                            doors[i].speed = (doors[i].size-35)/5
+
+                            doors[i].doorOpen = False
+                        
+
             if doors[i].doorOpen:
                 pygame.draw.rect(gameDisplay, grey, pygame.Rect(doors[i].x,doors[i].y,doors[i].size, doors[i].size*1.5))
             else:
                 pygame.draw.rect(gameDisplay, black, pygame.Rect(doors[i].x,doors[i].y,doors[i].size, doors[i].size*1.5))
+        
+        mouseDownPast = mouseDownNow
 
+        gameDisplay.blit(textsurface,(0,0))
+        
         
         # update screen and set FPS
         pygame.display.update()
