@@ -24,7 +24,7 @@ black = ((0,0,0))
 grey = ((150,150,150))
 
 # other required variables
-doors = []
+score = 0
 
 
 # sets up template for each door
@@ -37,7 +37,10 @@ class door:
 
 # game function
 def game():
+    global score
 
+    doors = []
+    
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
     textsurface = myfont.render("Score: " +str(0), False, (0, 0, 0))
     
@@ -94,12 +97,7 @@ def game():
             doors[i].y -= doors[i].speed
             
             if doors[i].y < 0-(doors[i].size*1.5):
-                doors[i].size = random.randrange(40, 70)
-                doors[i].y = display_height
-                doors[i].x = random.randrange(0, display_width-newDoor.size)
-                doors[i].speed = (doors[i].size-35)/5
-
-                doors[i].doorOpen = False
+                return
 
             if mouseX >= doors[i].x and mouseX <= doors[i].x + doors[i].size:
                 if mouseY >= doors[i].y and mouseY <= doors[i].y + doors[i].size*1.5:
@@ -130,9 +128,27 @@ def game():
         pygame.display.update()
         clock.tick(60)
 
+def gameOver():
+    myfont = pygame.font.SysFont('Comic Sans MS', 50)
+    textsurface = myfont.render('''Game Over - Score: %s''' % (score), False, (0, 0, 0))
+    gameDisplay.blit(textsurface,(70,70))
+    pygame.display.update()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return
+
 # launch game
 if __name__ == "__main__":
-    game()
+    while True:
+        game()
+        gameOver()
 
 pygame.quit()
 quit()
